@@ -11,12 +11,17 @@ canv.pack(fill = BOTH, expand = 1)
 button1=Button(root,text='Проверить',width=15,height=2,font='arial 8')
 button1.place(x ='20', y = '405')
 
-entry = Entry(root,  width=15, font='arial 8')
+entry = Entry(root,text = '25',width=15, font='arial 8')
 entry.place(x ='150', y = '410')
 
 def onEnter(event):
-    # return entry.get()
-    print(entry.get())
+    dificulty = int(entry.get())*24
+    if(dificulty<72):
+        table = create_board()
+        shufle()
+        delete_elements()
+        k()
+
 
 entry.bind("<Return>", onEnter)
 
@@ -95,7 +100,7 @@ def shufle(mod = 10):
         change(_change,_change2)
     transposing()
 
-def delete_elements(dificulty = 35):
+def delete_elements(dificulty = 25):
     cell_count = randint(dificulty - 5, dificulty+3)
     a = []
     row_to_delete = randint(0,8)
@@ -112,48 +117,48 @@ table = create_board()
 shufle()
 delete_elements()
 
-
-rr = 0
-a = []
-for r in range(nr): 
-    aa = 0
-    a.append([]) 
-
-    rc = 0
-    for c in range(nc): 
-        if(r%3 == 0 and r!=0 and aa<1):
-            rr+=0.2
-            rr = round(rr,1)
-            aa+=1
-        if(c%3 == 0 and c!=0 ):
-            rc+=0.2
-            rc = round(rc,1)
-        a[r].append(cell(r+rr,c+rc, table[r][c]) )# добавляем очередной элемент в строку
+def k():
+    rr = 0
+    a = []
+    for r in range(nr): 
+        aa = 0
+        a.append([]) 
+        rc = 0
+        for c in range(nc): 
+            if(r%3 == 0 and r!=0 and aa<1):
+                rr+=0.2
+                rr = round(rr,1)
+                aa+=1
+            if(c%3 == 0 and c!=0 ):
+                rc+=0.2
+                rc = round(rc,1)
+            a[r].append(cell(r+rr,c+rc, table[r][c]) )# добавляем очередной элемент в строку
  
-addd = 0
 
+
+k()
 def click(event):
-    def key(event):
-        print (event.char)
-        addd = event.char
-        new_top.destroy()
-
     x = event.x
     y = event.y
-    # print("{}  {}".format(x, y))
-    a,b = get_position(x, y)
-    new_top = Tk()
-    print('50x50+{}+{}'.format(100+x,100+y))
-    new_top.geometry('50x50+{}+{}'.format(100+x,100+y))
-    new_top.protocol('WM_DELETE_WINDOW', key)
+    aa,b = get_position(x, y)
+    def key(event):
+
+        table[aa][b] = event.char
+        new_top.destroy()
+        k()
+    if(table[aa][b] != ' '):
+        return
+    new_top = Toplevel()
+    new_top.geometry('250x30+{}+{}'.format(100+x,100+y))
+    w = Label(new_top, text="Введите значение с клавиатуры...")
+    w.pack()
     new_top.bind('<Key>', key)
-    
+    new_top.focus_set()
+    new_top.grab_set()
 
 
 canv.bind('<1>',click)
 
-
-print(addd)
 
 
 mainloop()
