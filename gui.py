@@ -1,13 +1,28 @@
 from tkinter import *
 from random import *
+from math import floor
   
 root = Tk()
-root.geometry('415x415')
-root.title('SUDOKU')
+root.geometry('415x455+100+100')
+root.title('SUDOKU by me)')
 canv = Canvas(root, bg = 'white')
 canv.pack(fill = BOTH, expand = 1)
- 
- 
+
+button1=Button(root,text='Проверить',width=15,height=2,font='arial 8')
+button1.place(x ='20', y = '405')
+
+entry = Entry(root,  width=15, font='arial 8')
+entry.place(x ='150', y = '410')
+
+def onEnter(event):
+    # return entry.get()
+    print(entry.get())
+
+entry.bind("<Return>", onEnter)
+
+button2=Button(root,text='Заново',width=15,height=2,font='arial 8')
+button2.place(x ='300', y = '405')
+
 m = 40 # размер ячеек
 d = 3 # размер поля вокруг ячейки
 nr = 9 # количество строк
@@ -21,11 +36,13 @@ class cell():
         self.n = n
         self.r = r # Номер сторки в двумерном списке.
         self.c = c # Номер столбца ...
-        self.color = 'white' #choice(colors) # случайный цвет из списка
+        if(n == ' '):
+            self.color = '#F0F0F8' 
+        else:
+            self.color = '#fe8787'
         self.id = canv.create_rectangle(-100,0,-100,0,fill = self.color) # квадратик ячейки
         self.id_text = canv.create_text(-100,0, text = self.n, font = "Arial 18" )
-        if(r!= -1 and c!=-1):
-            self.paint()
+        self.paint()
   
     def paint(self):
         x1 = x0 + self.c * m + d
@@ -41,9 +58,16 @@ class cell():
         y = (y1 + y2) / 2
         canv.coords(self.id_text,x,y)
         canv.itemconfig(self.id_text, text = self.n)
-  
-c_test = cell(-1,-1)
- 
+
+
+def get_position(x, y):
+    cc = floor(abs((d+x0-x)/m))
+    rr = floor(abs((d+x0-y)/m))
+    # print('x:{}, y:{}'.format(rr,cc)) 
+    return (rr,cc)
+    
+
+
 def change(k,n):
     for i in range(9):
         for j in range(9):
@@ -59,20 +83,16 @@ def transposing():
     global table
     table =  [list(i) for i in zip(*table)]
 
+
 def create_board(n = 3):
     return [[ ((i*n + i//n + j) % (n*n) + 1) for j in range(n*n)] for i in range(n*n)]
 
+
 def shufle(mod = 10):
-    # a = []
-    # _change,_change2 = 1,2
-    #     while((_change*100+_change2*10) in a and _change2 != _change):
-        # a.append(_change*100+_change2*10)
-        # print(_change,_change2)
     for i in range(mod):
         _change2 = randint(1,9)
         _change = randint(1,9)
         change(_change,_change2)
-
     transposing()
 
 def delete_elements(dificulty = 35):
@@ -90,20 +110,17 @@ def delete_elements(dificulty = 35):
 
 table = create_board()
 shufle()
-
 delete_elements()
-# for i in range(9):
-#     for j in range(9):
-#         print(table[i][j])
+
 
 rr = 0
 a = []
 for r in range(nr): 
     aa = 0
     a.append([]) 
+
     rc = 0
     for c in range(nc): 
-
         if(r%3 == 0 and r!=0 and aa<1):
             rr+=0.2
             rr = round(rr,1)
@@ -113,4 +130,30 @@ for r in range(nr):
             rc = round(rc,1)
         a[r].append(cell(r+rr,c+rc, table[r][c]) )# добавляем очередной элемент в строку
  
+addd = 0
+
+def click(event):
+    def key(event):
+        print (event.char)
+        addd = event.char
+        new_top.destroy()
+
+    x = event.x
+    y = event.y
+    # print("{}  {}".format(x, y))
+    a,b = get_position(x, y)
+    new_top = Tk()
+    print('50x50+{}+{}'.format(100+x,100+y))
+    new_top.geometry('50x50+{}+{}'.format(100+x,100+y))
+    new_top.protocol('WM_DELETE_WINDOW', key)
+    new_top.bind('<Key>', key)
+    
+
+
+canv.bind('<1>',click)
+
+
+print(addd)
+
+
 mainloop()
