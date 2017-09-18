@@ -1,5 +1,6 @@
 from tkinter import *
-from random import *
+from tkinter import messagebox
+from random import randint
 from math import floor
   
 root = Tk()
@@ -10,20 +11,9 @@ canv.pack(fill = BOTH, expand = 1)
 
 button1=Button(root,text='Проверить',width=15,height=2,font='arial 8')
 button1.place(x ='20', y = '405')
-
 entry = Entry(root,text = '25',width=15, font='arial 8')
 entry.place(x ='150', y = '410')
 
-def onEnter(event):
-    dificulty = int(entry.get())*24
-    if(dificulty<72):
-        table = create_board()
-        shufle()
-        delete_elements()
-        k()
-
-
-entry.bind("<Return>", onEnter)
 
 button2=Button(root,text='Заново',width=15,height=2,font='arial 8')
 button2.place(x ='300', y = '405')
@@ -65,13 +55,64 @@ class cell():
         canv.itemconfig(self.id_text, text = self.n)
 
 
-def get_position(x, y):
-    cc = floor(abs((d+x0-x)/m))
-    rr = floor(abs((d+x0-y)/m))
-    # print('x:{}, y:{}'.format(rr,cc)) 
-    return (rr,cc)
-    
+def check_col(column = 0 ):
+    tmp_table = [list(i) for i in zip(*table)]
+    if (len(set(tmp_table[column])) == len(tmp_table[column])):
+        return 0
+    return 1
 
+
+def check_row(row = 0):
+    if(len(set(table[row])) == len(table[row])):
+        return 0
+    return 1
+
+
+def check_block(k = 0, n = 0):
+    k*=3
+    n*=3
+    set_ = set()
+
+    for i in range(k,k+3):
+        for j in range(n,n+3):
+            set_.add(table[i][j])
+
+    if(len(set_) == 9):
+        return 0
+    return 1
+
+    
+def check_solution(event):
+    solution = 0
+    for i in range(9):
+        solution+=check_row(i)
+        solution+=check_col(i)
+    for i in range(3):
+        for j in range(3):
+            solution+=check_block(i,j)
+    if(not solution):
+        messagebox.showinfo( "Congratulate!" , 'sudoku is  solved!') 
+    else:
+        messagebox.showinfo( "Try again!" , 'sudoku is not solved!') 
+
+def onEnter(event):
+    pass
+    # dificulty = int(entry.get())*24
+    # if(dificulty<72):
+    #     table = create_board()
+    #     shufle()
+    #     delete_elements()
+    #     k()
+
+def get_position(x, y):
+    cc = floor(abs((d+x0-x+2)/m))
+    rr = floor(abs((d+x0-y+2)/m))
+    if(cc>5):
+        cc = floor(abs((d+x0-x+8)/m))
+    if(rr>5):
+        rr = floor(abs((d+x0-y+8)/m))
+    return (rr,cc)
+ 
 
 def change(k,n):
     for i in range(9):
@@ -100,7 +141,8 @@ def shufle(mod = 10):
         change(_change,_change2)
     transposing()
 
-def delete_elements(dificulty = 25):
+
+def delete_elements(dificulty = 15):
     cell_count = randint(dificulty - 5, dificulty+3)
     a = []
     row_to_delete = randint(0,8)
@@ -113,11 +155,8 @@ def delete_elements(dificulty = 25):
         a.append( (row_to_delete,col_to_delete) )
         table[row_to_delete][col_to_delete] = ' '
 
-table = create_board()
-shufle()
-delete_elements()
 
-def k():
+def write_table():
     rr = 0
     a = []
     for r in range(nr): 
@@ -135,18 +174,16 @@ def k():
             a[r].append(cell(r+rr,c+rc, table[r][c]) )# добавляем очередной элемент в строку
  
 
-
-k()
 def click(event):
     x = event.x
     y = event.y
-    aa,b = get_position(x, y)
+    a,b = get_position(x, y)
     def key(event):
 
-        table[aa][b] = event.char
+        table[a][b] = event.char
         new_top.destroy()
-        k()
-    if(table[aa][b] != ' '):
+        write_table()
+    if(table[a][b] != ' '):
         return
     new_top = Toplevel()
     new_top.geometry('250x30+{}+{}'.format(100+x,100+y))
@@ -157,8 +194,13 @@ def click(event):
     new_top.grab_set()
 
 
-canv.bind('<1>',click)
+if __name__ == '__main__':
+    table = create_board()
+    shufle()
+    delete_elements()
+    write_table()
 
-
-
-mainloop()
+    canv.bind('<1>',click)
+    button1.bind('<1>',check_solution)
+    entry.bind("<Return>", onEnter)
+    mainloop()
