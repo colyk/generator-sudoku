@@ -27,14 +27,13 @@ y0 = m // 2 # отступ от вернего края
 
   
 class cell():
-    def __init__(self, r, c, n = ' '): # при создании указываем номер строки и столбца, в который помещаем
+    def __init__(self, r, c, n = ' ',color = '#fe8787'): # при создании указываем номер строки и столбца, в который помещаем
         self.n = n
         self.r = r # Номер сторки в двумерном списке.
         self.c = c # Номер столбца ...
-        if(n == ' '):
+        self.color = color
+        if(n == ' ' and self.color == '#fe8787'):
             self.color = '#F0F0F8' 
-        else:
-            self.color = '#fe8787'
         self.id = canv.create_rectangle(-100,0,-100,0,fill = self.color) # квадратик ячейки
         self.id_text = canv.create_text(-100,0, text = self.n, font = "Arial 18" )
         self.paint()
@@ -155,10 +154,10 @@ def delete_elements(dificulty = 15):
         a.append( (row_to_delete,col_to_delete) )
         table[row_to_delete][col_to_delete] = ' '
 
-
+a = []
 def write_table():
     rr = 0
-    a = []
+
     for r in range(nr): 
         aa = 0
         a.append([]) 
@@ -171,19 +170,29 @@ def write_table():
             if(c%3 == 0 and c!=0 ):
                 rc+=0.2
                 rc = round(rc,1)
-            a[r].append(cell(r+rr,c+rc, table[r][c]) )# добавляем очередной элемент в строку
+            a[r].append(cell(r+rr,c+rc, table[r][c]) )
+
  
 
 def click(event):
     x = event.x
     y = event.y
-    a,b = get_position(x, y)
-    def key(event):
+    aa,b = get_position(x, y)
 
-        table[a][b] = event.char
+    def key(event):
+        try:
+            dig = int(event.char)
+
+        except Exception:
+            messagebox.showinfo( "Congratulate!" , 'Не коректное значение') 
+            return
+        if(dig == 0):
+            messagebox.showinfo( "Congratulate!" , 'Не коректное значение') 
+            return
+        table[aa][b] = dig
         new_top.destroy()
         write_table()
-    if(table[a][b] != ' '):
+    if(table[aa][b] != ' '):
         return
     new_top = Toplevel()
     new_top.geometry('250x30+{}+{}'.format(100+x,100+y))
@@ -199,7 +208,7 @@ if __name__ == '__main__':
     shufle()
     delete_elements()
     write_table()
-
+    
     canv.bind('<1>',click)
     button1.bind('<1>',check_solution)
     entry.bind("<Return>", onEnter)
