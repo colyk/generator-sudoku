@@ -6,22 +6,22 @@ from math import floor
 root = Tk()
 root.geometry('415x455+100+100')
 root.title('SUDOKU by me)')
-canv = Canvas(root, bg = 'white')
-canv.pack(fill = BOTH, expand = 1)
+canv = Canvas(root, bg='white')
+canv.pack(fill=BOTH, expand=1)
 
-button1=Button(root,text='Проверить',width=15,height=2,font='arial 8')
-button1.place(x ='20', y = '405')
-entry = Entry(root,text = '25',width=15, font='arial 8')
-entry.place(x ='150', y = '410')
+button1=Button(root,text='Check solution' ,width=15, height=2, font='arial 8')
+button1.place(x='20', y='405')
+entry = Entry(root, text='25',width=15, font='arial 8')
+entry.place(x ='150', y='410')
 
 
-button2=Button(root,text='Заново',width=15,height=2,font='arial 8')
-button2.place(x ='300', y = '405')
+button2=Button(root, text='Заново', width=15, height=2, font='arial 8')
+button2.place(x='300', y='405')
 
-m = 40 # размер ячеек
-d = 3 # размер поля вокруг ячейки
-nr = 9 # количество строк
-nc = 9 # количество столбцов
+m = 40      # cell size
+d = 3       # размер поля вокруг ячейки
+nr = 9      # number of row
+nc = 9      # number of collumn 
 x0 = m // 2 # отступ от левого края
 y0 = m // 2 # отступ от вернего края
 
@@ -141,7 +141,7 @@ def shufle(mod = 10):
     transposing()
 
 
-def delete_elements(dificulty = 15):
+def delete_elements(dificulty = 30):
     cell_count = randint(dificulty - 5, dificulty+3)
     a = []
     row_to_delete = randint(0,8)
@@ -195,9 +195,29 @@ def click(event):
     if(table[aa][b] != ' '):
         return
     new_top = Toplevel()
-    new_top.geometry('250x30+{}+{}'.format(100+x,100+y))
-    w = Label(new_top, text="Введите значение с клавиатуры...")
-    w.pack()
+    new_top.geometry('+{}+{}'.format(100+x,100+y))
+    # w = Label(new_top, text="Введите значение с клавиатуры...")
+    # w.pack()
+    var = IntVar()
+    var.set(' ') 
+
+    for i in range(1,10):
+        rad = Radiobutton (new_top,
+                    text = str(i),
+                    variable = var,
+                    value = i)
+        rad.pack()
+
+    def c(event):
+
+        dig = var.get()
+        table[aa][b] = dig
+        new_top.destroy()
+        write_table()
+
+    but = Button(new_top,text='Ответить',width=15,height=2,font='arial 8')
+    but.pack()
+    but.bind('<1>', c)
     new_top.bind('<Key>', key)
     new_top.focus_set()
     new_top.grab_set()
